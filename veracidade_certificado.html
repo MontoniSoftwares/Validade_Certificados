@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Consulta de Certificado</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f8fafb;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #16325c;
+        color: #fff;
+        padding: 30px 0 20px 0;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      }
+      .logo {
+        width: 130px;
+        margin-bottom: 10px;
+      }
+      .slogan {
+        font-size: 1.25rem;
+        font-weight: 400;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+      }
+      h1 {
+        margin: 10px 0 0 0;
+        font-size: 2.2rem;
+        font-weight: bold;
+        letter-spacing: 2px;
+      }
+      .container {
+        max-width: 620px;
+        margin: 38px auto 0 auto;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 14px rgba(22, 50, 92, 0.07);
+        padding: 26px 30px 16px 30px;
+        min-height: 380px;
+      }
+      input[type="text"] {
+        width: 350px;
+        padding: 8px 10px;
+        font-size: 1rem;
+        border-radius: 5px;
+        border: 1px solid #bbb;
+        margin-bottom: 10px;
+      }
+      button {
+        padding: 8px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        background: #2c689a;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        margin-left: 10px;
+        font-weight: 600;
+        transition: background 0.19s;
+      }
+      button:hover {
+        background: #244e6c;
+      }
+      h2 {
+        margin-top: 30px;
+        color: #174d84;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 8px;
+      }
+      #resultado {
+        margin-top: 25px;
+      }
+      .footer {
+        width: 100%;
+        background: #16325c;
+        color: #fff;
+        padding: 20px 0 12px 0;
+        text-align: center;
+        font-size: 1rem;
+        margin-top: 45px;
+        letter-spacing: 1px;
+        font-weight: 400;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+      }
+      @media (max-width: 700px) {
+        .container {
+          padding: 18px 8px 10px 8px;
+          max-width: 98vw;
+        }
+        input[type="text"] {
+          width: 99vw;
+          max-width: 99%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="logo-ms.png" alt="Montoni Tech Soluções" class="logo" />
+      <div class="slogan">Ensinando o Futuro</div>
+      <h1>Consulta de Certificado</h1>
+    </header>
+    <div class="container">
+      <input
+        type="text"
+        id="codigoInput"
+        placeholder="Digite o código do certificado"
+      />
+      <button onclick="consultarCertificado()">Consultar</button>
+      <div id="resultado"></div>
+    </div>
+    <footer class="footer">
+      Montoni Tech Soluções © 2025 <br />CNPJ 62.553.238/0001-00
+    </footer>
+    <script>
+      const supabaseUrl = "https://mzbozvwlmuamctstvcvs.supabase.co";
+      const supabaseAnonKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16Ym96dndsbXVhbWN0c3R2Y3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMwMzUxNTAsImV4cCI6MjA3ODYxMTE1MH0.V0UFeN1dGPzEbh6NhlQXup2yX-Re1a6vfHMN_6bNFdE";
+      const supabaseClient = supabase.createClient(
+        supabaseUrl,
+        supabaseAnonKey
+      );
+
+      async function consultarCertificado() {
+        const codigo = document.getElementById("codigoInput").value.trim();
+        const resultadoDiv = document.getElementById("resultado");
+        resultadoDiv.innerHTML = "";
+
+        if (!codigo) {
+          resultadoDiv.innerText = "Por favor, digite um código.";
+          return;
+        }
+
+        const { data, error } = await supabaseClient
+          .from("certificados")
+          .select("*")
+          .eq("codigo_certificado", codigo)
+          .single();
+
+        if (error) {
+          resultadoDiv.innerText = "Erro na consulta: " + error.message;
+          return;
+        }
+        if (!data) {
+          resultadoDiv.innerText = "Código não encontrado.";
+          return;
+        }
+
+        let html = `
+        <h2>Dados do Certificado</h2>
+        <ul>
+          <li><strong>Nome do Aluno:</strong> ${data.nome_aluno}</li>
+          <li><strong>CPF do Aluno:</strong> ${data.cpf_aluno}</li>
+          <li><strong>Nome do Curso:</strong> ${data.nome_curso}</li>
+          <li><strong>Carga Horária:</strong> ${data.carga_horaria} horas</li>
+          <li><strong>Data de Emissão:</strong> ${data.data_emissao}</li>
+          <li><strong>Nome do Instrutor:</strong> ${data.nome_instrutor}</li>
+          <li><strong>Empresa Emissora:</strong> ${data.empresa_emissora}</li>
+          <li><strong>Código do Certificado:</strong> ${data.codigo_certificado}</li>
+          <li><strong>Status:</strong> ${data.status}</li>
+        </ul>
+      `;
+
+        // Grade programática
+        if (data.grade_programatica) {
+          try {
+            const fixedGrade = data.grade_programatica
+              .replace(/""/g, '"')
+              .replace(/^"|"$/g, "");
+            const gradeArray = JSON.parse(fixedGrade);
+
+            html += "<h3>Grade Programática</h3><ul>";
+            gradeArray.forEach((item) => {
+              html += `<li><strong>${item.modulo}:</strong> ${item.descricao}</li>`;
+            });
+            html += "</ul>";
+          } catch (e) {
+            html += "<p>Grade programática inválida ou não disponível.</p>";
+          }
+        } else {
+          html += "<p>Grade programática não cadastrada.</p>";
+        }
+        resultadoDiv.innerHTML = html;
+      }
+    </script>
+  </body>
+</html>
