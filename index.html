@@ -150,7 +150,7 @@
           .from("certificados")
           .select("*")
           .eq("codigo_certificado", codigo)
-          .single();
+          .maybeSingle()
 
         if (error) {
           resultadoDiv.innerText = "Erro na consulta: " + error.message;
