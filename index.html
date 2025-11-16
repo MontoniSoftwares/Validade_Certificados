@@ -146,11 +146,13 @@
           return;
         }
 
+        console.log("Consultando código:", codigo);
+
         const { data, error } = await supabaseClient
           .from("certificados")
           .select("*")
           .eq("codigo_certificado", codigo)
-          .maybeSingle()
+          .maybeSingle();  // Alterado para maybeSingle()
 
         if (error) {
           resultadoDiv.innerText = "Erro na consulta: " + error.message;
